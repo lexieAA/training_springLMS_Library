@@ -18,7 +18,7 @@ import com.ss.training.spring.lms.entity.LibraryBranch;
 import com.ss.training.spring.lms.service.LibraryService;
 
 @RestController
-@RequestMapping("/lms/public/library/")
+@RequestMapping("/lms/public/library")
 
 public class LibraryController {
 
@@ -33,13 +33,13 @@ public class LibraryController {
 	}
 
 	// read branch by Id
-	@GetMapping("/branches/{branchId}")
+	@GetMapping("/branches/branch/{branchId}")
 	public List<LibraryBranch> getBranch(@PathVariable Long branchId) {
 		return libraryService.readLibraryBranch(branchId);
 	}
 
 	// update all branches
-	@PutMapping("/branches/{branchId}")
+	@PutMapping("/branches/branch/{branchId}")
 	public LibraryBranch updateLibraryBranch(@RequestBody LibraryBranch libraryBranch, @PathVariable Long branchId) {
 		libraryBranch.setBranchId(branchId);
 		return libraryService.updateLibraryBranch(libraryBranch);
@@ -48,13 +48,13 @@ public class LibraryController {
 	// ----------------------Book Copies Mapping --------------------------------
 
 	// read all book copies by branchId
-	@GetMapping("/branches/{branchId}/bookCopies")
+	@GetMapping("/branches/branch/{branchId}/bookCopies")
 	public List<BookCopies> getLibraryBookCopiesByBranch(@PathVariable Long branchId) {
 		return libraryService.readBookCopiesByBranchId(branchId);
 	}
 
 	// read all book copies by bookCopiesKey
-	@GetMapping("/branches/{branchId}/bookCopies/{bookId}")
+	@GetMapping("/branches/branch/{branchId}/bookCopies/bookcopy/{bookId}")
 	public Optional<BookCopies> getAllLibraryBookCopiesByBranchAndBook(@PathVariable Long branchId,
 			@PathVariable Long bookId) {
 		BookCopiesKey id = new BookCopiesKey(branchId, bookId);
@@ -62,7 +62,7 @@ public class LibraryController {
 	}
 
 	// update number of book copies
-	@PutMapping("/branches/{branchId}/bookCopies/{bookId}")
+	@PutMapping("/branches/branch/{branchId}/bookCopies/bookcopy/{bookId}")
 	public BookCopies addBookCopiesToBranch(@RequestBody BookCopies bookCopies, @PathVariable Long branchId,
 			@PathVariable Long bookId) {
 		// set BookCopiesKey id to branchId and bookId from path
@@ -73,7 +73,7 @@ public class LibraryController {
 	}
 	
 	// delete all book copies by branchId
-		@DeleteMapping("/branches/{branchId}/bookCopies/delete")
+		@DeleteMapping("/branches/branch/{branchId}/bookCopies/delete")
 		public void deleteByIdBranch(@PathVariable Long branchId) {
 			//TO DO create a list of all bookcopies by branch id use function in dao
 			//TO DO a loop to go through the list a delete
