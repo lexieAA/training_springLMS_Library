@@ -10,4 +10,6 @@ import com.ss.training.spring.lms.entity.LibraryBranch;
 @Repository
 public interface LibraryBranchDAO extends JpaRepository<LibraryBranch, Long> {
 	List<LibraryBranch> findByBranchId(Long branchId);
+	LibraryBranch findByBranchName(String branchName);
+	void deleteByBranchName(String branchName);
 }

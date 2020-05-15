@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,59 +29,99 @@ public class LibraryController {
 	// ----------------------Branches Mapping --------------------------------
 	// read all branches
 	@GetMapping("/branches")
-	public List<LibraryBranch> getAllBranches() {
-		return libraryService.readAllLibraryBranch();
+	public ResponseEntity<List<LibraryBranch>> getAllBranches() {
+		List<LibraryBranch> branch = libraryService.readAllLibraryBranch();
+		// a successful request should produce a list not null with a size greater than
+		// zero
+		if (branch != null && branch.size() > 0) {
+			return new ResponseEntity<List<LibraryBranch>>(branch, HttpStatus.OK);
+		} else {
+			// branch id not found, return 404 status
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	// read branch by Id
 	@GetMapping("/branches/branch/{branchId}")
-	public List<LibraryBranch> getBranch(@PathVariable Long branchId) {
-		return libraryService.readLibraryBranch(branchId);
+	public ResponseEntity<List<LibraryBranch>> getBranch(@PathVariable Long branchId) {
+		List<LibraryBranch> branch = libraryService.readLibraryBranch(branchId);
+		// a successful request should produce a list not null with a size greater than
+		// zero
+		if (branch != null && branch.size() > 0) {
+			return new ResponseEntity<List<LibraryBranch>>(branch, HttpStatus.OK);
+		} else {
+			// branch id not found, return 404 status
+			return ResponseEntity.notFound().build();
+		}
+
 	}
 
 	// update all branches
 	@PutMapping("/branches/branch/{branchId}")
-	public LibraryBranch updateLibraryBranch(@RequestBody LibraryBranch libraryBranch, @PathVariable Long branchId) {
+	public ResponseEntity<String> updateLibraryBranch(@RequestBody LibraryBranch libraryBranch,
+			@PathVariable Long branchId) {
+		Integer returnInt = -1; // for determining HttpStatus
+		Integer success = 1;
 		libraryBranch.setBranchId(branchId);
-		return libraryService.updateLibraryBranch(libraryBranch);
+		returnInt = libraryService.updateLibraryBranch(libraryBranch);
+
+		// indicate success or failure
+		if (returnInt == success) {
+			return new ResponseEntity<String>("Success", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Bad Request", HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	// ----------------------Book Copies Mapping --------------------------------
 
 	// read all book copies by branchId
 	@GetMapping("/branches/branch/{branchId}/bookCopies")
-	public List<BookCopies> getLibraryBookCopiesByBranch(@PathVariable Long branchId) {
-		return libraryService.readBookCopiesByBranchId(branchId);
+	public ResponseEntity<List<BookCopies>> getLibraryBookCopiesByBranch(@PathVariable Long branchId) {
+		List<BookCopies> copies = libraryService.readBookCopiesByBranchId(branchId);
+		// a successful request should produce a list not null with a size greater than
+		// zero
+		if (copies != null && copies.size() > 0) {
+			return new ResponseEntity<List<BookCopies>>(copies, HttpStatus.OK);
+		} else {
+			// copy id not found, return 404 status
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	// read all book copies by bookCopiesKey
 	@GetMapping("/branches/branch/{branchId}/bookCopies/bookcopy/{bookId}")
-	public Optional<BookCopies> getAllLibraryBookCopiesByBranchAndBook(@PathVariable Long branchId,
+	public ResponseEntity<BookCopies> getAllLibraryBookCopiesByBranchAndBook(@PathVariable Long branchId,
 			@PathVariable Long bookId) {
 		BookCopiesKey id = new BookCopiesKey(branchId, bookId);
-		return libraryService.readBookCopiesByKey(id);
+		Optional<BookCopies> copy = libraryService.readBookCopiesByKey(id);
+		// check if result found, and send response accordingly
+		if (copy.isPresent()) {
+			return new ResponseEntity<BookCopies>(copy.get(), HttpStatus.OK);
+		} else {
+			// copy id not found, return 404 status
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	// update number of book copies
 	@PutMapping("/branches/branch/{branchId}/bookCopies/bookcopy/{bookId}")
-	public BookCopies addBookCopiesToBranch(@RequestBody BookCopies bookCopies, @PathVariable Long branchId,
+	public ResponseEntity<String> addBookCopiesToBranch(@RequestBody BookCopies bookCopies, @PathVariable Long branchId,
 			@PathVariable Long bookId) {
+		Integer returnInt = -1; // for determining HttpStatus
+		Integer success = 1;
 		// set BookCopiesKey id to branchId and bookId from path
 		BookCopiesKey id = new BookCopiesKey(branchId, bookId);
 		// set BookCopies BookCopiesKey
 		bookCopies.setId(id);
-		return libraryService.updateBookCopies(bookCopies);
-	}
-	
-	// delete all book copies by branchId
-		@DeleteMapping("/branches/branch/{branchId}/bookCopies/delete")
-		public void deleteByIdBranch(@PathVariable Long branchId) {
-			//TO DO create a list of all bookcopies by branch id use function in dao
-			//TO DO a loop to go through the list a delete
-			Long bookId = (long) 1;
-			// set BookCopiesKey id to branchId and bookId from path
-			BookCopiesKey id = new BookCopiesKey(branchId, bookId);
-			libraryService.delateBookCopies(id);
+		returnInt = libraryService.updateBookCopies(bookCopies);
+		
+		// indicate success or failure
+		if (returnInt == success) {
+			return new ResponseEntity<String>("Success" + returnInt, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Bad Request" + returnInt, HttpStatus.BAD_REQUEST);
 		}
+	}
 
 }

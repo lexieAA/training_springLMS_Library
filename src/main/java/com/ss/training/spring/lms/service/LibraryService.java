@@ -22,9 +22,14 @@ public class LibraryService {
 	LibraryBranchDAO libraryBranchDao;
 
 	// -----------------Library Branch Services---------------------
-	public LibraryBranch updateLibraryBranch(LibraryBranch branch) {
-		return libraryBranchDao.save(branch);
-
+	public Integer updateLibraryBranch(LibraryBranch branch) {
+		// update branch if id matches existing record
+		if (libraryBranchDao.findById(branch.getBranchId()).isPresent()) {
+			libraryBranchDao.save(branch);
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
 	public List<LibraryBranch> readAllLibraryBranch() {
@@ -37,12 +42,14 @@ public class LibraryService {
 
 	// -----------------Book Copies Services---------------------
 
-	public BookCopies updateBookCopies(BookCopies copy) {
-		return bookCopiesDao.save(copy);
-	}
-	
-	public void delateBookCopies(BookCopiesKey id) {
-		bookCopiesDao.deleteById(id);
+	public Integer updateBookCopies(BookCopies copy) {
+		// search for by id
+		if (bookCopiesDao.findById(copy.getId()).isPresent()) {
+			bookCopiesDao.save(copy);
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
 	public Optional<BookCopies> readBookCopiesByKey(BookCopiesKey id) {
